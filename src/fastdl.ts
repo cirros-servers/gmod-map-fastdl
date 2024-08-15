@@ -42,7 +42,7 @@ for (const file of files) {
     if (!["vmt", "vtf", "mdl", "vvd", "ani", "vtx", "phy", "png", "jpg", "jpeg", "wav", "ogg", "mp3"].includes(fileExt))
         continue;
 
-    script += `    resource.AddSingleFile("${encodeURI(file)}")\n`;
+    script += `    resource.AddSingleFile("${file}")\n`;
 }
 script += "end";
 
