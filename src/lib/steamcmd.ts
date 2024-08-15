@@ -48,7 +48,7 @@ class SteamCMD {
                 itemId.toString(),
                 "+exit",
             ]).stdout.toString();
-            console.log(stdout);
+            // console.log(stdout);
         }
 
         const item = resolve(`${this.addonStorage}/steamapps/workshop/content/${gameId}/${itemId}`);
