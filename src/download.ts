@@ -3,6 +3,7 @@ import { setTimeout } from "node:timers/promises";
 import GMAD from "./lib/gmad";
 import SteamCMD from "./lib/steamcmd";
 import { glob } from "glob";
+import LZMA from "./lib/lzma";
 
 try {
     await readdir(Bun.env.GARRYSMOD);
@@ -12,32 +13,37 @@ try {
 
 const cmd = new SteamCMD();
 await cmd.init(Bun.env.STEAMCMD, Bun.env.ADDON_STORAGE);
-
 const gmad = new GMAD(); // bacon?
 await gmad.init(Bun.env.GMAD);
+const lzma = new LZMA();
+await lzma.init(Bun.env.GMOD_LZMA);
 
 const addons = [
-    2910505837, // arc9 base
-    2131057232, // arccw base
-    1131455085, // gred base
-    2912816023, // lvs framework
-    2912826012, // lvs planes
-    3027255911, // lvs cars
+    2619660952, // PRETTIER NO
+    140618773,
+    169600867,
+    1572373847,
+    2556466049,
+    115250988,
+    122421739,
+    1403089746,
+    104468359,
 ];
 
 let folders = [];
 for await (const id of addons) {
     console.log("Downloading:", id);
-    const { path, steamUsed } = await cmd.workshopDownloadItem(4000, id);
+    let { path, steamUsed } = await cmd.workshopDownloadItem(4000, id);
 
-    if (path.includes(".bin")) {
-        console.log("Failed to extract:", id);
-        continue;
-    } else if (path.includes(".gma")) {
-        folders.push({ id, addon: await gmad.extract(path) });
+    if (path.includes(".bin") && !(await exists(path.replace(".bin", ".gma")))) {
+        path = await lzma.extract(path);
     }
 
-    if (steamUsed) await setTimeout(1000 * 11);
+    folders.push({ id, addon: await gmad.extract(path.replace(".bin", ".gma")) });
+
+    // This doesn't actually mitigate any rate limits. It's so each request
+    // will have a valid two-factor token (and needs to be re-thought)
+    if (steamUsed && Bun.env.STEAM_TOTP_SECRET) await setTimeout(1000 * 11);
 }
 
 for await (const { id, addon } of folders) {

@@ -7,5 +7,6 @@ declare module "bun" {
         STEAMCMD: string;
         ADDON_STORAGE: string;
         GARRYSMOD: string;
+        GMOD_LZMA: string;
     }
 }

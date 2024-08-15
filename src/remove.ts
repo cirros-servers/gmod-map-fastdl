@@ -1,6 +1,6 @@
 import { readFile, rm } from "node:fs/promises";
 
-const ADDON_LIST = "addonmap/<thing>.txt";
+const ADDON_LIST = "addonmap/ITEMID.txt";
 
 const file = await readFile(Bun.env.GARRYSMOD + "/" + ADDON_LIST, { encoding: "utf-8" });
 for await (const path of file.split("\n")) {
