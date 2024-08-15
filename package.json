@@ -1,0 +1,19 @@
+{
+    "name": "gmsrv-addon-manager",
+    "type": "module",
+    "scripts": {
+        "download": "bun run src/download.ts",
+        "remove": "bun run src/remove.ts",
+        "fastdl": "bun run src/fastdl.ts"
+    },
+    "devDependencies": {
+        "@types/bun": "latest"
+    },
+    "peerDependencies": {
+        "typescript": "^5.0.0"
+    },
+    "dependencies": {
+        "glob": "^11.0.0",
+        "steam-totp-strict": "^2.0.2"
+    }
+}
