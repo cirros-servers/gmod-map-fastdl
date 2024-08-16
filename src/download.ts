@@ -19,15 +19,7 @@ const lzma = new LZMA();
 await lzma.init(Bun.env.GMOD_LZMA);
 
 const addons = [
-    2619660952, // PRETTIER NO
-    140618773,
-    169600867,
-    1572373847,
-    2556466049,
-    115250988,
-    122421739,
-    1403089746,
-    104468359,
+    2501718455, // PRETTIER NO
 ];
 
 let folders = [];

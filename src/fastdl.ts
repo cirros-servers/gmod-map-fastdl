@@ -2,6 +2,7 @@ import { writeFile, readFile, readdir, mkdir, exists } from "node:fs/promises";
 import { glob } from "glob";
 
 const maps = await glob("*.txt", { cwd: Bun.env.GARRYSMOD + "/addonmap", absolute: true });
+const filetypes = ["vmt", "vtf", "mdl", "vvd", "ani", "vtx", "phy", "png", "jpg", "jpeg", "wav", "ogg", "mp3"];
 
 let files: Set<string> = new Set();
 for await (const map of maps) {
@@ -17,8 +18,7 @@ for (const file of files) {
         console.log("File has no extension?", file);
         process.exit();
     }
-    if (!["vmt", "vtf", "mdl", "vvd", "ani", "vtx", "phy", "png", "jpg", "jpeg", "wav", "ogg", "mp3"].includes(fileExt))
-        continue;
+    if (!["gma", "nav", "ain", ...filetypes].includes(fileExt)) continue;
 
     if (!(await exists(`${Bun.env.GARRYSMOD}/${file}.bz2`))) {
         console.log("Compressing:", file);
@@ -39,8 +39,7 @@ for (const file of files) {
         console.log("File has no extension?", file);
         process.exit();
     }
-    if (!["vmt", "vtf", "mdl", "vvd", "ani", "vtx", "phy", "png", "jpg", "jpeg", "wav", "ogg", "mp3"].includes(fileExt))
-        continue;
+    if (!filetypes.includes(fileExt)) continue;
 
     script += `    resource.AddSingleFile("${file}")\n`;
 }
