@@ -18,24 +18,21 @@ await gmad.init(Bun.env.GMAD);
 const lzma = new LZMA();
 await lzma.init(Bun.env.GMOD_LZMA);
 
-const addons = [
-    2501718455, // PRETTIER NO
-];
+const addons = [];
 
 let folders = [];
 for await (const id of addons) {
     console.log("Downloading:", id);
-    let { path, steamUsed } = await cmd.workshopDownloadItem(4000, id);
+    let { path } = await cmd.workshopDownloadItem(4000, id).catch((e) => {
+        return { path: "" };
+    });
+    if (!path.length) continue;
 
     if (path.includes(".bin") && !(await exists(path.replace(".bin", ".gma")))) {
         path = await lzma.extract(path);
     }
 
     folders.push({ id, addon: await gmad.extract(path.replace(".bin", ".gma")) });
-
-    // This doesn't actually mitigate any rate limits. It's so each request
-    // will have a valid two-factor token (and needs to be re-thought)
-    if (steamUsed && Bun.env.STEAM_TOTP_SECRET) await setTimeout(1000 * 11);
 }
 
 for await (const { id, addon } of folders) {
@@ -56,4 +53,6 @@ for await (const { id, addon } of folders) {
             console.log("Exists:", file);
         }
     }
+
+    process.exit();
 }

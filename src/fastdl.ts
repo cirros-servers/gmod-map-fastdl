@@ -18,7 +18,7 @@ for (const file of files) {
         console.log("File has no extension?", file);
         process.exit();
     }
-    if (!["gma", "nav", "ain", ...filetypes].includes(fileExt)) continue;
+    if (!["bsp", "nav", "ain", ...filetypes].includes(fileExt)) continue;
 
     if (!(await exists(`${Bun.env.GARRYSMOD}/${file}.bz2`))) {
         console.log("Compressing:", file);
