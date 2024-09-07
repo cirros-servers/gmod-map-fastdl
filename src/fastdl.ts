@@ -5,10 +5,25 @@ const maps = await glob("*.txt", { cwd: Bun.env.GARRYSMOD + "/addonmap", absolut
 const filetypes = ["vmt", "vtf", "mdl", "vvd", "ani", "vtx", "phy", "png", "jpg", "jpeg", "wav", "ogg", "mp3"];
 
 let files: Set<string> = new Set();
+let mapsaddons: Map<string, Set<string>> = new Map();
 for await (const map of maps) {
     const file = await readFile(map, { encoding: "utf-8" });
-    for (const line of file.split("\n")) {
-        files.add(line);
+    if (file.includes(".bsp")) {
+        const mapname = file.match(/maps\/(\w+).bsp/g) as String[];
+        if (!mapname?.[0]) {
+            console.log("Couldn't process addonmap", map);
+            continue;
+        }
+        const mapset: Set<string> = new Set();
+        for (const line of file.split("\n")) {
+            mapset.add(line);
+        }
+
+        mapsaddons.set(mapname[0].replace("maps/", "").replace(".bsp", ""), mapset);
+    } else {
+        for (const line of file.split("\n")) {
+            files.add(line);
+        }
     }
 }
 
@@ -42,6 +57,23 @@ for (const file of files) {
     if (!filetypes.includes(fileExt)) continue;
 
     script += `    resource.AddSingleFile("${file}")\n`;
+}
+
+for (const mapname of mapsaddons.keys()) {
+    script += `    if game.GetMap() == "${mapname}" then\n`;
+    const mapfiles = mapsaddons.get(mapname);
+    if (!mapfiles) throw new Error("map does nt have files lawl");
+    for (const file of mapfiles) {
+        const fileExt = file.split(".").pop();
+        if (!fileExt) {
+            console.log("File has no extension?", file);
+            process.exit();
+        }
+        if (!filetypes.includes(fileExt)) continue;
+
+        script += `        resource.AddSingleFile("${file}")\n`;
+    }
+    script += `    end\n`;
 }
 script += "end";
 
