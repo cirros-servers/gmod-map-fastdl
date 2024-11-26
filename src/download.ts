@@ -1,58 +1,42 @@
-import { readdir, mkdir, cp, writeFile, exists } from "node:fs/promises";
-import { setTimeout } from "node:timers/promises";
-import GMAD from "./lib/gmad";
-import SteamCMD from "./lib/steamcmd";
-import { glob } from "glob";
-import LZMA from "./lib/lzma";
+import { env } from "bun";
+import { extract, parse } from "./lib/gma";
+import { download } from "./lib/steam";
+import { readdir, mkdir } from "node:fs/promises";
 
-try {
-    await readdir(Bun.env.GARRYSMOD);
-} catch (err) {
-    await mkdir(Bun.env.GARRYSMOD);
-}
+const ADDONS = [1];
 
-const cmd = new SteamCMD();
-await cmd.init(Bun.env.STEAMCMD, Bun.env.ADDON_STORAGE);
-const gmad = new GMAD(); // bacon?
-await gmad.init(Bun.env.GMAD);
-const lzma = new LZMA();
-await lzma.init(Bun.env.GMOD_LZMA);
+export async function main() {
+    const downloads = await download(ADDONS);
 
-const addons = [];
+    let addon_list: { id: string; path: string; location: string }[] = [];
 
-let folders = [];
-for await (const id of addons) {
-    console.log("Downloading:", id);
-    let { path } = await cmd.workshopDownloadItem(4000, id).catch((e) => {
-        return { path: "" };
-    });
-    if (!path.length) continue;
+    for (let { id, file } of downloads) {
+        const buffer = await Bun.file(file).arrayBuffer();
+        const addon = await parse(Buffer.from(buffer));
+        const addonPath = `${env.GARRYSMOD}/addons/${addon.name.toLocaleLowerCase().replaceAll(" ", "_")}_generated`;
 
-    if (path.includes(".bin") && !(await exists(path.replace(".bin", ".gma")))) {
-        path = await lzma.extract(path);
-    }
+        try {
+            await readdir(addonPath);
+        } catch (_) {
+            await mkdir(addonPath, { recursive: true });
+        }
 
-    folders.push({ id, addon: await gmad.extract(path.replace(".bin", ".gma")) });
-}
+        for (let { path } of addon.files) {
+            if (addon_list.find((_) => _.path === path)) throw new Error(`!! ${path} already exists`);
 
-for await (const { id, addon } of folders) {
-    const files = await glob("**/*.*", { cwd: addon });
+            const output = await extract({ file: Buffer.from(buffer), addon, fileName: path });
+            let folders: string | string[] = path.split("/");
+            folders.pop();
+            folders = folders.join("/");
 
-    try {
-        await readdir(`${Bun.env.GARRYSMOD}/addonmap`);
-    } catch (err) {
-        await mkdir(`${Bun.env.GARRYSMOD}/addonmap`);
-    }
-    await writeFile(`${Bun.env.GARRYSMOD}/addonmap/${id}.txt`, files.join("\n"));
+            await mkdir(addonPath + "/" + folders, { recursive: true });
+            await Bun.write(addonPath + "/" + path, output as any);
 
-    for await (const file of files) {
-        if (!(await exists(`${Bun.env.GARRYSMOD}/${file}`))) {
-            console.log("Transferring:", file);
-            await cp(`${addon}/${file}`, `${Bun.env.GARRYSMOD}/${file}`, { recursive: true });
-        } else {
-            console.log("Exists:", file);
+            addon_list.push({ id, path, location: addonPath + "/" + path });
         }
     }
 
-    process.exit();
+    await Bun.write(`${env.GARRYSMOD}/addons/map.json`, JSON.stringify(addon_list, null, 4));
 }
+
+main();

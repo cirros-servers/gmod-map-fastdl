@@ -7,6 +7,5 @@ Everything else can be handled just fine by `resource.AddWorkshop()`.
 ## Dependencies
 
 -   A Steam account that owns Garry's Mod (duh)
--   [gmod-lzma](https://github.com/WilliamVenner/gmod-lzma-rs)
--   [gmad](https://github.com/Facepunch/gmad)
+-   Your Linux distribution's flavor of `bzip2`, available in `PATH`
 -   [steamcmd](https://developer.valvesoftware.com/wiki/SteamCMD)

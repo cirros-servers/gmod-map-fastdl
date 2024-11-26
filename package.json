@@ -1,5 +1,5 @@
 {
-    "name": "gmsrv-addon-manager",
+    "name": "gmod-addon-scripts",
     "type": "module",
     "scripts": {
         "download": "bun run src/download.ts",
@@ -13,7 +13,7 @@
         "typescript": "^5.0.0"
     },
     "dependencies": {
-        "glob": "^11.0.0",
-        "steam-totp-strict": "^2.0.2"
+        "@napi-rs/lzma": "^1.4.1",
+        "glob": "^11.0.0"
     }
 }
