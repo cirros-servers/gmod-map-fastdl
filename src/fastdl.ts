@@ -57,7 +57,9 @@ if (SERVER) then\n`;
         folders.pop();
         folders = folders.join("/");
         await mkdir(folders, { recursive: true });
-        await exec(`bzip2 -kzc ${location} > ${destination}`);
+        await exec(
+            `bzip2 -kzc ${location.replaceAll("(", "\\(").replaceAll(")", "\\)")} > ${destination.replaceAll("(", "\\(").replaceAll(")", "\\)")}`
+        );
         console.log(destination);
     }
 
