@@ -45,6 +45,8 @@ if (SERVER) then\n`;
 
     script += `end\n`;
 
+    console.log("Finished script generation");
+
     for (let { path, location } of MAP) {
         const extension = path.split(".").pop();
         if (!extension) throw new Error("Addon file without an extension?");
@@ -56,6 +58,7 @@ if (SERVER) then\n`;
         folders = folders.join("/");
         await mkdir(folders, { recursive: true });
         await exec(`bzip2 -kzc ${location} > ${destination}`);
+        console.log(destination);
     }
 
     const addonPath = `${env.GARRYSMOD}/addons/fastdl_generated/lua/autorun/server`;
