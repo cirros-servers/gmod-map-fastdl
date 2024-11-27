@@ -15,7 +15,8 @@ function sanitize(input: string) {
         .replaceAll(":", "\\:")
         .replaceAll("[", "\\[")
         .replaceAll("]", "\\]")
-        .replaceAll("|", "\\|");
+        .replaceAll("|", "\\|")
+        .replaceAll(" ", "\\ ");
 }
 
 export async function main() {
