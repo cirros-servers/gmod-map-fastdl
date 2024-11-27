@@ -19,6 +19,9 @@
 
 import { lzma } from "@napi-rs/lzma";
 
+let lastDecompressedSource: string | null = null;
+let lastDecompressedBuffer: Buffer | null = null;
+
 interface Addon {
     name: string;
     author: string;
@@ -45,8 +48,18 @@ function readNTString(buf: Buffer, start: number): [string, number] {
     return [buf.toString("ascii", start, lookAhead), lookAhead + 1];
 }
 
-export async function parse(file: Buffer): Promise<Addon> {
-    if (file.toString("hex", 0, 4) !== "474d4144") file = await lzma.decompress(file as any);
+async function decompressWrapper(id: string, file: any) {
+    if (lastDecompressedSource === id && lastDecompressedBuffer !== null) return lastDecompressedBuffer;
+
+    const decompressed = await lzma.decompress(file);
+    lastDecompressedSource = id;
+    lastDecompressedBuffer = decompressed;
+
+    return decompressed;
+}
+
+export async function parse(id: string, file: Buffer): Promise<Addon> {
+    if (file.toString("hex", 0, 4) !== "474d4144") file = await decompressWrapper(id, file);
     if (file.toString("hex", 4, 5) !== "03") throw new Error("Unsupported version/invalid file");
 
     let cursor = 5;
@@ -118,12 +131,12 @@ export async function parse(file: Buffer): Promise<Addon> {
     };
 }
 
-export async function extract(options: { file: Buffer; addon?: Addon; fileName: string }): Promise<Buffer> {
-    if (options.file.toString("hex", 0, 4) !== "474d4144") options.file = await lzma.decompress(options.file as any);
+export async function extract(options: { id: string; file: Buffer; addon?: Addon; fileName: string }): Promise<Buffer> {
+    if (options.file.toString("hex", 0, 4) !== "474d4144") options.file = await decompressWrapper(options.id, options.file);
     if (options.file.toString("hex", 4, 5) !== "03") throw new Error("Unsupported version/invalid file");
 
     if (!options.file && !options.fileName) throw new Error("file or fileName not specified");
-    if (!options.addon) options.addon = await parse(options.file);
+    if (!options.addon) options.addon = await parse(options.id, options.file);
     if (!options.addon) throw new Error("Unable to read file");
 
     const file = options.addon.files.find((_) => _.path === options.fileName);

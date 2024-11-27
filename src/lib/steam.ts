@@ -1,8 +1,6 @@
 import { env } from "bun";
-import { promisify } from "node:util";
-import * as child_process from "node:child_process";
+import { exec } from "node:child_process";
 import { readdir } from "node:fs/promises";
-const exec = promisify(child_process.exec);
 
 export async function download(itemIds: number[]) {
     if (!itemIds.length) throw new Error("Not enough item ids");
@@ -32,7 +30,15 @@ export async function download(itemIds: number[]) {
 
     steamcmdParams += "+quit";
 
-    const steamcmd = await exec(`"${env.STEAMCMD}" ${steamcmdParams}`).catch((e) => e);
+    const steamcmd: { stdout: string; stderr: string } = await new Promise((resolve, reject) => {
+        const proc = exec(`"${env.STEAMCMD}" ${steamcmdParams}`, {}, (err, stdout, stderr) => {
+            if (err) return reject(err);
+            resolve({ stdout, stderr });
+        });
+
+        if (proc.stdout) proc.stdout.on("data", (_) => console.log(_));
+    });
+
     const lines = steamcmd.stdout.split("\n");
     let downloads = [];
 

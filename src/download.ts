@@ -12,7 +12,7 @@ export async function main() {
 
     for (let { id, file } of downloads) {
         const buffer = await Bun.file(file).arrayBuffer();
-        const addon = await parse(Buffer.from(buffer));
+        const addon = await parse(id, Buffer.from(buffer));
         const addonPath = `${env.GARRYSMOD}/addons/${addon.name.toLocaleLowerCase().replaceAll(" ", "_")}_generated`;
 
         try {
@@ -22,12 +22,18 @@ export async function main() {
         }
 
         for (let { path } of addon.files) {
-            if (addon_list.find((_) => _.path === path)) throw new Error(`!! ${path} already exists`);
+            const entry = addon_list.find((_) => _.path === path);
+            if (entry) {
+                console.log(`\u001b[48;2;255;0;0m!! ${path} already exists at ${entry.location} !!\u001b[49m`);
+                continue;
+            }
 
-            const output = await extract({ file: Buffer.from(buffer), addon, fileName: path });
+            const output = await extract({ id, file: Buffer.from(buffer), addon, fileName: path });
             let folders: string | string[] = path.split("/");
             folders.pop();
             folders = folders.join("/");
+
+            console.log(addonPath + "/" + path);
 
             await mkdir(addonPath + "/" + folders, { recursive: true });
             await Bun.write(addonPath + "/" + path, output as any);
