@@ -8,6 +8,16 @@ export const CLIENT_FILES = ["vmt", "vtf", "mdl", "vvd", "ani", "vtx", "phy", "p
 export const MAP_FILES = ["bsp", "nav", "ain"];
 const MAP: { id: string; path: string; location: string }[] = await Bun.file(`${env.GARRYSMOD}/addons/map.json`).json();
 
+function sanitize(input: string) {
+    return input
+        .replaceAll("(", "\\(")
+        .replaceAll(")", "\\)")
+        .replaceAll(":", "\\:")
+        .replaceAll("[", "\\[")
+        .replaceAll("]", "\\]")
+        .replaceAll("|", "\\|");
+}
+
 export async function main() {
     let script = `-- Any changes made to this file will NOT be persisted
     
@@ -57,9 +67,7 @@ if (SERVER) then\n`;
         folders.pop();
         folders = folders.join("/");
         await mkdir(folders, { recursive: true });
-        await exec(
-            `bzip2 -kzc ${location.replaceAll("(", "\\(").replaceAll(")", "\\)")} > ${destination.replaceAll("(", "\\(").replaceAll(")", "\\)")}`
-        );
+        await exec(`bzip2 -kzc ${sanitize(location)} > ${sanitize(destination)}`);
         console.log(destination);
     }
 
