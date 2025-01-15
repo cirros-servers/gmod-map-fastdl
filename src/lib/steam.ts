@@ -19,8 +19,8 @@ export async function download(itemIds: number[]) {
 
     let steamcmdParams =
         env.STEAM_ANONYMOUS === "1"
-            ? `+force_install_dir /tmp/steam +login anonymous `
-            : `+force_install_dir /tmp/steam +login ${env.STEAM_USERNAME} ${env.STEAM_PASSWORD} `;
+            ? `+force_install_dir ${env.STEAM_OUTPUT} +login anonymous `
+            : `+force_install_dir ${env.STEAM_OUTPUT} +login ${env.STEAM_USERNAME} ${env.STEAM_PASSWORD} `;
 
     for (let item of publishedfiledetails) {
         const { consumer_app_id, publishedfileid } = item;
