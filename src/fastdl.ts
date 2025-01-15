@@ -14,6 +14,7 @@ export async function main() {
     for (let { id, path } of MAP) if (path.endsWith(".bsp")) addonsWithMaps.add(id);
     for (let id of addonsWithMaps) {
         const addonFiles = MAP.filter((_) => _.id === id);
+        if (!addonFiles.find((_) => CLIENT_FILES.includes(_.path.split(".").pop() || ""))) continue;
         const mapFiles = addonFiles.filter((_) => _.path.endsWith(".bsp"));
         if (!mapFiles.length) throw new Error("Map addon without bsp?");
 
