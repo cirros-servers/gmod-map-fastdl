@@ -38,27 +38,28 @@ export async function main() {
 
     console.log("Finished script generation");
 
-    const start = Date.now();
+    if (env.SKIP_COMPRESSION !== "1") {
+        const start = Date.now();
 
-    for (let { path, location } of MAP) {
-        const extension = path.split(".").pop();
-        if (!extension) throw new Error("Addon file without an extension?");
-        if (!CLIENT_FILES.includes(extension) && !MAP_FILES.includes(extension)) continue;
+        for (let { path, location } of MAP) {
+            const extension = path.split(".").pop();
+            if (!extension) throw new Error("Addon file without an extension?");
+            if (!CLIENT_FILES.includes(extension) && !MAP_FILES.includes(extension)) continue;
 
-        const destination = `${env.FASTDL_STORAGE}/${path}.bz2`;
-        let folders: string | string[] = destination.split("/");
-        folders.pop();
-        folders = folders.join("/");
+            const destination = `${env.FASTDL_STORAGE}/${path}.bz2`;
+            let folders: string | string[] = destination.split("/");
+            folders.pop();
+            folders = folders.join("/");
 
-        await mkdir(folders, { recursive: true });
-        await exec(`lbzip2 -kzc "${location}" > "${destination}"`);
+            await mkdir(folders, { recursive: true });
+            await exec(`lbzip2 -kzc "${location}" > "${destination}"`);
 
-        console.log(destination);
+            console.log(destination);
+        }
+
+        const end = Date.now();
+        console.log("Compression took", end - start, "ms!");
     }
-
-    const end = Date.now();
-
-    console.log("Compression took", end - start, "ms!");
 
     const addonPath = `${env.GARRYSMOD}/addons/fastdl_generated/lua/autorun/server`;
     await mkdir(addonPath, { recursive: true });
