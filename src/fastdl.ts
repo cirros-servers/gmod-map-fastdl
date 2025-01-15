@@ -54,6 +54,10 @@ end\n\n`;
             if (!CLIENT_FILES.includes(extension) && !MAP_FILES.includes(extension)) continue;
 
             const destination = `${env.FASTDL_STORAGE}/${path}.bz2`;
+
+            const exists = await Bun.file(destination).exists();
+            if (exists) continue;
+
             let folders: string | string[] = destination.split("/");
             folders.pop();
             folders = folders.join("/");

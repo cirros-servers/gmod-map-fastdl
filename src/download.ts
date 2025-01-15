@@ -27,6 +27,9 @@ export async function main() {
         }
 
         for (let { path } of addon.files) {
+            const exists = await Bun.file(addonPath + "/" + path).exists();
+            if (exists) continue;
+
             const entry = addon_list.find((_) => _.path === path);
             if (entry) {
                 console.log(`\u001b[48;2;255;0;0m!! ${path} already exists, skipping !!\u001b[49m`);
