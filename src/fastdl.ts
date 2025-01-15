@@ -8,9 +8,7 @@ const exec = promisify(child_process.exec);
 const MAP: { id: string; path: string; location: string }[] = await Bun.file(`${env.GARRYSMOD}/addons/map.json`).json();
 
 export async function main() {
-    let script = `-- Any changes made to this file will NOT be persisted
-    
-if (SERVER) then\n`;
+    let script = "-- Any changes made to this file will NOT be persisted\n\n";
 
     let addonsWithMaps = new Set();
     for (let { id, path } of MAP) if (path.endsWith(".bsp")) addonsWithMaps.add(id);
@@ -26,19 +24,17 @@ if (SERVER) then\n`;
             mapNames.push(mapName);
         }
 
-        script += `  if string.find("${mapNames.join(" ")}", game.GetMap()) then\n`;
+        script += `if string.find("${mapNames.join(" ")}", game.GetMap()) then\n`;
 
         for (let file of addonFiles) {
             const extension = file.path.split(".").pop();
             if (!extension) throw new Error("Map file without an extension?");
             if (!CLIENT_FILES.includes(extension)) continue;
-            script += `    resource.AddSingleFile("${file.path}")\n`;
+            script += `  resource.AddSingleFile("${file.path}")\n`;
         }
 
-        script += `  end\n`;
+        script += `end\n`;
     }
-
-    script += `end\n`;
 
     console.log("Finished script generation");
 
