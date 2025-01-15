@@ -10,6 +10,13 @@ const MAP: { id: string; path: string; location: string }[] = await Bun.file(`${
 export async function main() {
     let script = "-- Any changes made to this file will NOT be persisted\n\n";
 
+    script += `function addFiles(tbl)
+    for i,v in ipairs(tbl) do
+        -- resource.AddSingleFile(v)
+        print(v)
+    end
+end\n\n`;
+
     let addonsWithMaps = new Set();
     for (let { id, path } of MAP) if (path.endsWith(".bsp")) addonsWithMaps.add(id);
     for (let id of addonsWithMaps) {
@@ -26,14 +33,16 @@ export async function main() {
         }
 
         script += `if string.find("${mapNames.join(" ")}", game.GetMap()) then\n`;
+        script += `  addFiles({`;
 
         for (let file of addonFiles) {
             const extension = file.path.split(".").pop();
             if (!extension) throw new Error("Map file without an extension?");
             if (!CLIENT_FILES.includes(extension)) continue;
-            script += `  resource.AddSingleFile("${file.path}")\n`;
+            script += ` "${file.path}",`;
         }
 
+        script += ` })\n`;
         script += `end\n`;
     }
 

@@ -1,5 +1,5 @@
 import { env } from "bun";
-import { rmdir, rm } from "node:fs/promises";
+import { rm } from "node:fs/promises";
 import { CLIENT_FILES, MAP_FILES } from "./lib";
 
 const MAP: { id: string; path: string; location: string }[] = await Bun.file(`${env.GARRYSMOD}/addons/map.json`).json();
