@@ -11,10 +11,7 @@ export async function main() {
     let script = "-- Any changes made to this file will NOT be persisted\n\n";
 
     script += `function addFiles(tbl)
-    for i,v in ipairs(tbl) do
-        -- resource.AddSingleFile(v)
-        print(v)
-    end
+    for i,v in ipairs(tbl) do resource.AddSingleFile(v) end
 end\n\n`;
 
     let addonsWithMaps = new Set();
