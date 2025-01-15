@@ -55,7 +55,7 @@ if (SERVER) then\n`;
         folders = folders.join("/");
 
         await mkdir(folders, { recursive: true });
-        await exec(`lbzip2 -kzc '${location.replace("'", "\\'")}' > '${destination.replace("'", "\\'")}'`);
+        await exec(`lbzip2 -kzc "${location}" > "${destination}"`);
 
         console.log(destination);
     }
