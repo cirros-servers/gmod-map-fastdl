@@ -29,7 +29,7 @@ export async function main() {
         for (let { path } of addon.files) {
             const entry = addon_list.find((_) => _.path === path);
             if (entry) {
-                console.log(`\u001b[48;2;255;0;0m!! ${path} already exists at ${entry.location} !!\u001b[49m`);
+                console.log(`\u001b[48;2;255;0;0m!! ${path} already exists !!\u001b[49m`);
                 continue;
             }
 
