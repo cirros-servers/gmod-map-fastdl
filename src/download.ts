@@ -36,7 +36,7 @@ export async function main() {
             const entry = addon_list.find((_) => _.path === path);
             if (entry) {
                 console.log(`\u001b[48;2;255;0;0m!! ${path} already exists, skipping !!\u001b[49m`);
-                return;
+                continue;
             }
 
             const output = await extract({ id, file: Buffer.from(buffer), addon, fileName: path });
