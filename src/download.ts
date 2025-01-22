@@ -13,6 +13,7 @@ const ADDONS = [
 
 export async function main() {
     const downloads = await download(ADDONS);
+    console.log("Got downloads list.");
 
     let addon_list: { id: string; path: string; location: string }[] = [];
 
