@@ -28,13 +28,15 @@ export async function main() {
         }
 
         for (let { path } of addon.files) {
+            addon_list.push({ id, path, location: addonPath + "/" + path });
+
             const exists = await Bun.file(addonPath + "/" + path).exists();
             if (exists) continue;
 
             const entry = addon_list.find((_) => _.path === path);
             if (entry) {
                 console.log(`\u001b[48;2;255;0;0m!! ${path} already exists, skipping !!\u001b[49m`);
-                continue;
+                return;
             }
 
             const output = await extract({ id, file: Buffer.from(buffer), addon, fileName: path });
@@ -46,8 +48,6 @@ export async function main() {
 
             await mkdir(addonPath + "/" + folders, { recursive: true });
             await Bun.write(addonPath + "/" + path, output as any);
-
-            addon_list.push({ id, path, location: addonPath + "/" + path });
         }
     }
 
