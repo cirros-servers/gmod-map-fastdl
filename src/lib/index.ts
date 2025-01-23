@@ -1,4 +1,21 @@
-export const CLIENT_FILES = ["vmt", "vtf", "mdl", "vvd", "ani", "vtx", "phy", "png", "jpg", "jpeg", "wav", "ogg", "mp3"];
+export const CLIENT_FILES = [
+    "vmt", // Textures
+    "vtf",
+    "mdl", // Models
+    "vvd",
+    "ani",
+    "vtx",
+    "phy",
+    "png", // Images
+    "jpg",
+    "jpeg",
+    "wav", // Sounds
+    "ogg",
+    "mp3",
+    "aac",
+    "pcf", // Particles
+    "ttf", // Fonts
+];
 export const MAP_FILES = ["bsp", "nav", "ain"];
 
 export function sanitize(input: string) {
