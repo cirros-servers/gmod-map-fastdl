@@ -30,8 +30,6 @@ export async function main() {
         }
 
         for (let { path } of addon.files) {
-            addon_list.push({ id, path, location: addonPath + "/" + path });
-
             const exists = await Bun.file(addonPath + "/" + path).exists();
             if (exists) continue;
 
@@ -40,6 +38,8 @@ export async function main() {
                 console.log(`\u001b[48;2;255;0;0m!! ${path} already exists, skipping !!\u001b[49m`);
                 continue;
             }
+
+            addon_list.push({ id, path, location: addonPath + "/" + path });
 
             const output = await extract({ id, file: Buffer.from(buffer), addon, fileName: path });
             let folders: string | string[] = path.split("/");
