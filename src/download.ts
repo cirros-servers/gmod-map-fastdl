@@ -9,7 +9,7 @@ const ADDONS = [
     3360227650, 2821234125, 2533339955, 2129643967, 2541605149, 2637442004, 3254618986, 741592270, 2821179466, 3149067981,
     3373875462, 2917067836, 3008347203, 2235936290, 1656078410, 2010286798, 268096025, 2558933448, 1864156937, 1601428630,
     3027406388, 3055424196, 3238708088, 3338529371, 3366444216, 3305629964, 3302364964, 3334581973, 266666023, 2991458245,
-    2589623334, 2589610334, 2267329131, 2113786004, 2925489145, 1635596292, 2174226635, 3261566870, 3414995121, 3355146789
+    2589623334, 2589610334, 2267329131, 2113786004, 2925489145, 1635596292, 2174226635, 3261566870, 3414995121, 3355146789,
 ];
 
 export async function main() {
@@ -30,9 +30,6 @@ export async function main() {
         }
 
         for (let { path } of addon.files) {
-            const exists = await Bun.file(addonPath + "/" + path).exists();
-            if (exists) continue;
-
             const entry = addon_list.find((_) => _.path === path);
             if (entry) {
                 console.log(`\u001b[48;2;255;0;0m!! ${path} already exists, skipping !!\u001b[49m`);
@@ -41,12 +38,15 @@ export async function main() {
 
             addon_list.push({ id, path, location: addonPath + "/" + path });
 
+            const exists = await Bun.file(addonPath + "/" + path).exists();
+            if (exists) continue;
+
+            console.log(addonPath + "/" + path);
+
             const output = await extract({ id, file: Buffer.from(buffer), addon, fileName: path });
             let folders: string | string[] = path.split("/");
             folders.pop();
             folders = folders.join("/");
-
-            console.log(addonPath + "/" + path);
 
             await mkdir(addonPath + "/" + folders, { recursive: true });
             await Bun.write(addonPath + "/" + path, output as any);

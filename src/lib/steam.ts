@@ -36,8 +36,10 @@ export async function download(itemIds: number[]) {
             resolve({ stdout, stderr });
         });
 
-        if (proc.stdout) proc.stdout.on("data", (_) => console.log(_));
+        if (proc.stdout) proc.stdout.on("data", (_) => process.stdout.write(_));
     });
+
+    console.log();
 
     const lines = steamcmd.stdout.split("\n");
     let downloads = [];
